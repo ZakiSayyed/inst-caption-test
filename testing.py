@@ -254,7 +254,7 @@ def check_user(username, password):
     return False
 
 def signup_user(username, password, sender_email):
-    users = sheet.get_all_records(expected_headers=expected_headers)
+    users = sheet
     for user in users:
         if user['Username'] == username:
             return False  # Username already exists
@@ -262,7 +262,7 @@ def signup_user(username, password, sender_email):
     return True
 
 def login_count(username, password):
-    users = sheet.get_all_records(expected_headers=expected_headers)
+    users = sheet
     for i, user in enumerate(users):
         if user['Username'] == username and user['Password'] == password:
             # Increment the login count
