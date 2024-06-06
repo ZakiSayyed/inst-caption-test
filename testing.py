@@ -242,7 +242,7 @@ def check_user(username, password):
     # return False
 
     for user in users:
-        if user['Username'] == username and user['Password'] == password and user['Count'] == 2:
+        if user['Username'] == username and user['Password'] == password and user['Count'] >= 2 and user['Status'] == 'trial':
             return 'limit'
         elif user['Username'] == username and user['Password'] == password and user['Count'] < 2 and user['Status'] == 'verified':
             return True
@@ -349,7 +349,7 @@ if not st.session_state.logged_in:
                 # st.markdown("<h1 style='text-align: left; font-size: 20px;'>Email : xyz@gmail.com.</h1>", unsafe_allow_html=True)
                 sender_email_1 = st.text_input("Sender Email (For confirmation)")
         else:
-            status = 'verified'
+            status = 'trial'
 
         if st.button("Signup"):
             sender_email = sender_email_1
