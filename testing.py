@@ -244,6 +244,8 @@ def check_user(username, password):
     for user in users:
         if user['Username'] == username and user['Password'] == password and user['Count'] >= 2 and user['Status'] == 'trial':
             return 'limit'
+        if user['Username'] == username and user['Password'] == password and user['Count'] < 2 and user['Status'] == 'trial':
+            return True        
         elif user['Username'] == username and user['Password'] == password and user['Count'] < 2 and user['Status'] == 'verified':
             return True
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
