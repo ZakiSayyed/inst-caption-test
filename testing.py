@@ -234,12 +234,21 @@ expected_headers = ['Username', 'Password', 'Count', 'Sender', 'Status']
 
 def check_user(username, password):
     users = sheet #.get_all_records(expected_headers=expected_headers)
+    # for user in users:
+    #     if user['Username'] == username and user['Password'] == password and user['Count'] == 2:
+    #         return 'limit'
+    #     elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
+    #         return True
+    #     elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
+    #         return 'pending'
+    # return False
+
     for user in users:
-        if user['Username'] == username and user['Password'] == password and user['Count'] == 2:
+        if user[1] == username and user[2] == password and user[3] == 2:
             return 'limit'
-        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
+        elif user[1] == username and user[2] == password and user[5] == 'verified':
             return True
-        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
+        elif user[1] == username and user[2] == password and user[5] == 'pending':
             return 'pending'
     return False
 
