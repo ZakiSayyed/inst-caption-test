@@ -206,8 +206,6 @@ def main(username,password):
     generate_caption(image_filename, image_data, selected_vibe, additional_prompt_text,username,password)
 
 def load_google_sheets_credentials():
-    expected_headers = ['Username', 'Password', 'Count', 'Sender', 'Status']
-
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict({
         "type": "service_account",
@@ -225,7 +223,6 @@ def load_google_sheets_credentials():
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
     all_records = sheet.get_all_records()  # Use get_all_values instead
-    # print(all_records)
     return all_records
     
 sheet = load_google_sheets_credentials()
@@ -261,14 +258,35 @@ def signup_user(username, password, sender_email):
     sheet.append_row([username, password, 0, sender_email])
     return True
 
+def update_celll(i, user):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict({
+        "type": "service_account",
+        "project_id": st.secrets["google_sheets"]["project_id"],
+        "private_key_id": st.secrets["google_sheets"]["private_key_id"],
+        "private_key": st.secrets["google_sheets"]["private_key"],
+        "client_email": st.secrets["google_sheets"]["client_email"],
+        "client_id": st.secrets["google_sheets"]["client_id"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": st.secrets["google_sheets"]["client_x509_cert_url"]
+    }, scope)
+    client = gspread.authorize(creds)
+    sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
+    sheet = client.open_by_key(sheet_id).sheet1
+    new_count = user['Count'] + 1
+    sheet.update_cell(i + 2, 3, new_count)  # Update the count in the sheet (i + 2 to account for header)
+    return True
+
+
 def login_count(username, password):
     users = sheet
     for i, user in enumerate(users):
         if user['Username'] == username and user['Password'] == password:
             # Increment the login count
-            new_count = user['Count'] + 1
-            sheet.update_cell(i + 2, 3, new_count)  # Update the count in the sheet (i + 2 to account for header)
-            return True
+            update_celll(i, user)
+            
     return False  # Username or password incorrect
 
 
