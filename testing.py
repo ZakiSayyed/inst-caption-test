@@ -231,15 +231,7 @@ sheet = load_google_sheets_credentials()
 expected_headers = ['Username', 'Password', 'Count', 'Sender', 'Status']
 
 def check_user(username, password):
-    users = sheet #.get_all_records(expected_headers=expected_headers)
-    # for user in users:
-    #     if user['Username'] == username and user['Password'] == password and user['Count'] == 2:
-    #         return 'limit'
-    #     elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
-    #         return True
-    #     elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
-    #         return 'pending'
-    # return False
+    users = sheet
 
     for user in users:
         if user['Username'] == username and user['Password'] == password and user['Count'] >= 2 and user['Status'] == 'trial':
@@ -269,7 +261,7 @@ def signup_add_user(username, password, sender_email, status):
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
-    sheet.append_row([username, password, 0, sender_email, status])  # Update the count in the sheet (i + 2 to account for header)
+    sheet.append_row([username, password, 0, sender_email, status]) 
     return True
 
 
@@ -391,3 +383,5 @@ if not st.session_state.logged_in:
                 st.error("Invalid username or password")
 else:
     main(st.session_state.username, st.session_state.password)
+
+st.markdown("<h1 style='text-align: center; font-size: 15px;'>Support \nautomatexpos.gmail.com</h1>", unsafe_allow_html=True)
