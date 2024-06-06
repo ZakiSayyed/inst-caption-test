@@ -362,10 +362,11 @@ if not st.session_state.logged_in:
             sender_email = sender_email_1
             if new_username and new_password:
                 if signup_user(new_username, new_password,sender_email, status):
+                    st.success('Congratulations! You have signed up for the account.')
+
                     with st.spinner('Please wait while your payment is being processed...'):
                         time.sleep(5)
-                    st.success('Congratulations! You have signed up for the account.')
-                    st.success('Please Log in to continue.')
+                    st.success('You can log in to continue once your payment is verified.')
                     time.sleep(5)
                     st.rerun()
                 else:
