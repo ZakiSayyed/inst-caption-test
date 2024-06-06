@@ -5,7 +5,6 @@ import requests
 import base64
 import os
 import time
-import toml
 
 # secrets = toml.load("secrets.toml")
 # secrets = toml.load("D:\Fiverr\Signup-Login Streamlit test\Test\.streamlit\secrets.toml")
@@ -207,6 +206,8 @@ def main(username,password):
     generate_caption(image_filename, image_data, selected_vibe, additional_prompt_text,username,password)
 
 def load_google_sheets_credentials():
+    expected_headers = ['Username', 'Password', 'Count', 'Sender', 'Status']
+
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict({
         "type": "service_account",
@@ -223,15 +224,16 @@ def load_google_sheets_credentials():
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
-    return sheet
-
+    all_records = sheet.get_all_records(expected_headers=expected_headers)  # Use get_all_values instead
+    return all_records
+    
 sheet = load_google_sheets_credentials()
 
 # Define the expected headers explicitly
-expected_headers = ['Username', 'Password', 'Count', 'Sender', 'Status',]
+expected_headers = ['Username', 'Password', 'Count', 'Sender', 'Status']
 
 def check_user(username, password):
-    users = sheet.get_all_records(expected_headers=expected_headers)
+    users = sheet #.get_all_records(expected_headers=expected_headers)
     for user in users:
         if user['Username'] == username and user['Password'] == password and user['Count'] == 2:
             return 'limit'
