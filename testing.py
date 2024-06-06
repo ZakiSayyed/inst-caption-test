@@ -7,7 +7,7 @@ import os
 import time
 import toml
 
-# secrets = toml.load("secrets.toml")
+secrets = toml.load("secrets.toml")
 # secrets = toml.load("D:\Fiverr\Signup-Login Streamlit test\Test\.streamlit\secrets.toml")
 
 
@@ -207,8 +207,6 @@ def main(username,password):
     generate_caption(image_filename, image_data, selected_vibe, additional_prompt_text,username,password)
 
 def load_google_sheets_credentials():
-    secrets = st.secrets["google_sheets"]
-    
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict({
         "type": "service_account",
