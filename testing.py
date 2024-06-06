@@ -129,7 +129,7 @@ def generate_caption(image_filename, image_data, vibe, prompt, username, passwor
     with col4:
         if st.button("Logout"):
                 st.session_state.logged_in = False
-                st.experimental_rerun()  # Rerun to reflect logout
+                st.rerun()  # Rerun to reflect logout
     
 
 def encode_image(image_data):
@@ -362,7 +362,7 @@ if not st.session_state.logged_in:
                     st.success('Congratulations! You have signed up for the account.')
                     st.success('Please Log in to continue.')
                     time.sleep(5)
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.error("Username already exists. Please choose a different username.")
             else:
@@ -382,7 +382,7 @@ if not st.session_state.logged_in:
                     time.sleep(5)                
                 st.success(f"Welcome back {username}!")
                 time.sleep(3)
-                st.experimental_rerun()
+                st.rerun()
             elif state == 'limit':
                 st.error("Sorry, Limit Exceeded. Please purchase the plan to use the tool")
             elif state == 'pending':
