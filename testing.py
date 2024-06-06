@@ -345,9 +345,10 @@ if not st.session_state.logged_in:
             else:
                 st.subheader("Pay to : xyz@gmail.com")
                 # st.markdown("<h1 style='text-align: left; font-size: 20px;'>Email : xyz@gmail.com.</h1>", unsafe_allow_html=True)
-                sender_email = st.text_input("Sender Email (For confirmation)")
+                sender_email_1 = st.text_input("Sender Email (For confirmation)")
 
         if st.button("Signup"):
+            sender_email = sender_email_1
             if new_username and new_password:
                 if signup_user(new_username, new_password,sender_email):
                     with st.spinner('Please wait while your payment is being processed...'):
