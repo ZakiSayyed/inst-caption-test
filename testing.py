@@ -71,58 +71,70 @@ def generate_caption(image_filename, image_data, vibe, prompt, username, passwor
     """, unsafe_allow_html=True)
 
     if st.button("Generate Captions"):
-        login_count(username, password)
-
-        if image_filename is not None and image_data is not None:
-
-            with placeholder.container():
-                st.write("Generating captions...")   
-            caption = call_api(image_data, vibe, prompt)
-            
-            # Enable for Caption 2
-            # caption_2 = call_api(image_data, vibe, prompt)
-
-            source_background_color = st.get_option("theme.backgroundColor")
-
-            placeholder.empty()
-
-            box_style = """
-            <style>
-            .shadow-box {
-                background-color: #333333;
-                border-radius: 15px; /* Increase the curvature of the edges */
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                padding: 20px;
-                margin: 20px 0;
-                max-width: auto;
-                color: #ffffff; /* Set text color to white */
-            }
-            </style>
-            """
-
-            # Add the CSS to the Streamlit app
-            st.markdown(box_style, unsafe_allow_html=True)
-
-            # st.markdown("<h1 style='text-align: center; font-size: 20px;'>Generated Captions:</h1>", unsafe_allow_html=True)
-            
-            box_content = f"""
-            <div class="shadow-box">
-                {caption}
-            </div>
-            """
-            st.markdown(box_content, unsafe_allow_html=True)
-
-            # Enable for Caption 2
-            # time.sleep(2)
-            # box_content = f"""
-            # <div class="shadow-box">
-            #     {caption_2}
-            # </div>
-            # """
-            # st.markdown(box_content, unsafe_allow_html=True)
-
+        state = check_user(username, password)
+        
+        if state == 'limit':
+            st.error("Sorry, Limit Exceeded. Please purchase the plan to use the tool")
+            st.error("Contact support email to purchase the plan, please add your username in the email")
+            with st.spinner('Logging out...'):
+                time.sleep(1)
+            st.session_state.logged_in = False
+            st.rerun()  # Rerun to reflect logout            
+        
         else:
-            st.error("Please upload an image first.")
+
+            login_count(username, password)
+
+            if image_filename is not None and image_data is not None:
+
+                with placeholder.container():
+                    st.write("Generating captions...")   
+                caption = call_api(image_data, vibe, prompt)
+                
+                # Enable for Caption 2
+                # caption_2 = call_api(image_data, vibe, prompt)
+
+                source_background_color = st.get_option("theme.backgroundColor")
+
+                placeholder.empty()
+
+                box_style = """
+                <style>
+                .shadow-box {
+                    background-color: #333333;
+                    border-radius: 15px; /* Increase the curvature of the edges */
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    padding: 20px;
+                    margin: 20px 0;
+                    max-width: auto;
+                    color: #ffffff; /* Set text color to white */
+                }
+                </style>
+                """
+
+                # Add the CSS to the Streamlit app
+                st.markdown(box_style, unsafe_allow_html=True)
+
+                # st.markdown("<h1 style='text-align: center; font-size: 20px;'>Generated Captions:</h1>", unsafe_allow_html=True)
+                
+                box_content = f"""
+                <div class="shadow-box">
+                    {caption}
+                </div>
+                """
+                st.markdown(box_content, unsafe_allow_html=True)
+
+                # Enable for Caption 2
+                # time.sleep(2)
+                # box_content = f"""
+                # <div class="shadow-box">
+                #     {caption_2}
+                # </div>
+                # """
+                # st.markdown(box_content, unsafe_allow_html=True)
+
+            else:
+                st.error("Please upload an image first.")
 
     col1, col2, col3, col4= st.columns([1, 2, 3, 4])
 
@@ -130,7 +142,7 @@ def generate_caption(image_filename, image_data, vibe, prompt, username, passwor
         if st.button("Logout"):
                 st.session_state.logged_in = False
                 st.rerun()  # Rerun to reflect logout
-    
+        
 
 def encode_image(image_data):
     return base64.b64encode(image_data).decode('utf-8')
