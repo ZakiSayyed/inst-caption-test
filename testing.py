@@ -7,8 +7,8 @@ import os
 import time
 import toml
 
-# secrets = toml.load("secrets.toml")
-secrets = toml.load("D:\Fiverr\Signup-Login Streamlit test\Test\.streamlit\secrets.toml")
+secrets = toml.load("secrets.toml")
+# secrets = toml.load("D:\Fiverr\Signup-Login Streamlit test\Test\.streamlit\secrets.toml")
 
 
 st.markdown("<h1 style='text-align: center;'>Instagram Caption Generator</h1>", unsafe_allow_html=True)
