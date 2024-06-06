@@ -224,7 +224,7 @@ def load_google_sheets_credentials():
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
-    all_records = sheet.get_all_records(expected_headers=expected_headers)  # Use get_all_values instead
+    all_records = sheet.get_all_values(expected_headers=expected_headers)  # Use get_all_values instead
     return all_records
     
 sheet = load_google_sheets_credentials()
