@@ -77,7 +77,7 @@ def generate_caption(image_filename, image_data, vibe, prompt, username, passwor
             st.error("Sorry, Limit Exceeded. Please purchase the plan to use the tool")
             st.error("Contact support email to purchase the plan, please add your username in the email")
             with st.spinner('Logging out...'):
-                time.sleep(1)
+                time.sleep(5)
             st.session_state.logged_in = False
             st.rerun()  # Rerun to reflect logout            
         
