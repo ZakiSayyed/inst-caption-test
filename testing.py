@@ -267,7 +267,7 @@ def signup_add_user(username, password, sender_email):
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
-    sheet.append_row([username, password, 0, sender_email])  # Update the count in the sheet (i + 2 to account for header)
+    sheet.append_row([username, password, 0, sender_email, 'pending'])  # Update the count in the sheet (i + 2 to account for header)
     return True
 
 
