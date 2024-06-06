@@ -246,9 +246,9 @@ def check_user(username, password):
     users = sheet
 
     for user in users:
-        if user['Username'] == username and user['Password'] == password and user['Count'] >= 2 and user['Status'] == 'trial':
+        if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial':
             return 'limit'
-        if user['Username'] == username and user['Password'] == password and user['Count'] < 2 and user['Status'] == 'trial':
+        if user['Username'] == username and user['Password'] == password and user['Count'] <= 2 and user['Status'] == 'trial':
             return True        
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
             return True
@@ -337,14 +337,15 @@ if not st.session_state.logged_in:
         st.subheader("Create a new account")
         new_username = st.text_input("Username")
         new_password = st.text_input("Password", type='password')
-        subscription_type = st.radio("Select Subscription Type", ["Free Trial (2 Captions only)", "Paid Subscription"])
+        subscription_type = st.radio("Select Subscription Type", ["Free Trial (1 Caption only)", "Paid Subscription"])
 
         sender_email_1 = None  # Define sender_email_1 here
         status = 'pending'
         if subscription_type == "Paid Subscription":
-            payment_type = st.radio("Select Payment Type", ["Crypto - USDT", "Paypal"])
+            # payment_type = st.radio("Select Payment Type", ["Crypto - USDT", "Paypal"])
+            payment_type = st.radio("Select Payment Type", ["Crypto - USDT"])
             if payment_type == "Crypto - USDT":
-                st.subheader("Crypto - USDT")
+                st.subheader("Crypto - USDT (5$ for 10 Captions)")
                 st.markdown("<h1 style='text-align: left; font-size: 20px;'>Make sure to use only -BNB Smart Chain- Network.</h1>", unsafe_allow_html=True)
                 st.markdown("<h1 style='text-align: left; font-size: 25px;'>Wallet Address</h1>", unsafe_allow_html=True)
                 st.markdown("<h1 style='text-align: left; font-size: 20px;'>0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1</h1>", unsafe_allow_html=True)
