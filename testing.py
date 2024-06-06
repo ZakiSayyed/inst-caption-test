@@ -315,8 +315,9 @@ if not st.session_state.logged_in:
             payment_type = st.radio("Select Payment Type", ["Crypto - USDT", "Paypal"])
             if payment_type == "Crypto - USDT":
                 st.subheader("Crypto - USDT")
-                st.markdown("<h1 style='text-align: left; font-size: 15px;'>Make sure to use only -BNB Smart Chain- Network.</h1>", unsafe_allow_html=True)
-                st.image("https://github.com/ZakiSayyed/inst-caption-test/blob/8885da53da524f2989fb167fcbf0ef9819d70e6b/binance.jpg", caption="0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1")
+                st.markdown("<h1 style='text-align: left; font-size: 20px;'>Make sure to use only -BNB Smart Chain- Network.</h1>", unsafe_allow_html=True)
+                st.markdown("<h1 style='text-align: left; font-size: 25px;'>Wallet Address</h1>", unsafe_allow_html=True)
+                st.image(caption="0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1")
             else:
                 st.subheader("Pay to : xyz@gmail.com")
                 # st.markdown("<h1 style='text-align: left; font-size: 20px;'>Email : xyz@gmail.com.</h1>", unsafe_allow_html=True)
