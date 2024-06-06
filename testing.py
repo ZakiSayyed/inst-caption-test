@@ -224,7 +224,8 @@ def load_google_sheets_credentials():
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
-    all_records = sheet.get_all_values()  # Use get_all_values instead
+    all_records = sheet.get_all_records()  # Use get_all_values instead
+    # print(all_records)
     return all_records
     
 sheet = load_google_sheets_credentials()
@@ -244,11 +245,11 @@ def check_user(username, password):
     # return False
 
     for user in users:
-        if user[1] == username and user[2] == password and user[3] == 2:
+        if user['Username'] == username and user['Password'] == password and user['Count'] == 2:
             return 'limit'
-        elif user[1] == username and user[2] == password and user[5] == 'verified':
+        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
             return True
-        elif user[1] == username and user[2] == password and user[5] == 'pending':
+        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
             return 'pending'
     return False
 
