@@ -228,7 +228,7 @@ def load_google_sheets_credentials():
 sheet = load_google_sheets_credentials()
 
 # Define the expected headers explicitly
-expected_headers = ['Username', 'Password', 'Count']
+expected_headers = ['Username', 'Password', 'Count', 'Sender', 'Status']
 
 def check_user(username, password):
     users = sheet.get_all_records(expected_headers=expected_headers)
