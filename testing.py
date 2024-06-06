@@ -377,8 +377,10 @@ if not st.session_state.logged_in:
                 st.rerun()
             elif state == 'limit':
                 st.error("Sorry, Limit Exceeded. Please purchase the plan to use the tool")
+                st.error("Contact support email to purchase the plan")
             elif state == 'pending':
                 st.error("Sorry, Your payment is still pending. Please wait..")
+                st.error("Contact support email if payment is not verified within 5 minutes")
             else:
                 st.error("Invalid username or password")
 else:
