@@ -317,7 +317,9 @@ if not st.session_state.logged_in:
                 st.subheader("Crypto - USDT")
                 st.markdown("<h1 style='text-align: left; font-size: 20px;'>Make sure to use only -BNB Smart Chain- Network.</h1>", unsafe_allow_html=True)
                 st.markdown("<h1 style='text-align: left; font-size: 25px;'>Wallet Address</h1>", unsafe_allow_html=True)
-                st.image("",caption="0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1")
+                st.markdown("<h1 style='text-align: left; font-size: 20px;'>0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1</h1>", unsafe_allow_html=True)
+
+                # st.im("",caption="0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1")
             else:
                 st.subheader("Pay to : xyz@gmail.com")
                 # st.markdown("<h1 style='text-align: left; font-size: 20px;'>Email : xyz@gmail.com.</h1>", unsafe_allow_html=True)
