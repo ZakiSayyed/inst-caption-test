@@ -333,6 +333,8 @@ if not st.session_state.logged_in:
         new_password = st.text_input("Password", type='password')
         subscription_type = st.radio("Select Subscription Type", ["Free Trial (2 Captions only)", "Paid Subscription"])
 
+        sender_email_1 = None  # Define sender_email_1 here
+
         if subscription_type == "Paid Subscription":
             payment_type = st.radio("Select Payment Type", ["Crypto - USDT", "Paypal"])
             if payment_type == "Crypto - USDT":
