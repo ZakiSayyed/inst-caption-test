@@ -7,7 +7,7 @@ import os
 import time
 import toml
 
-secrets = toml.load("secrets.toml")
+# secrets = toml.load("secrets.toml")
 # secrets = toml.load("D:\Fiverr\Signup-Login Streamlit test\Test\.streamlit\secrets.toml")
 
 
@@ -210,15 +210,15 @@ def load_google_sheets_credentials():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict({
         "type": "service_account",
-        "project_id": secrets["google_sheets"]["project_id"],
-        "private_key_id": secrets["google_sheets"]["private_key_id"],
-        "private_key": secrets["google_sheets"]["private_key"],
-        "client_email": secrets["google_sheets"]["client_email"],
-        "client_id": secrets["google_sheets"]["client_id"],
+        "project_id": st.secrets["google_sheets"]["project_id"],
+        "private_key_id": st.secrets["google_sheets"]["private_key_id"],
+        "private_key": st.secrets["google_sheets"]["private_key"],
+        "client_email": st.secrets["google_sheets"]["client_email"],
+        "client_id": st.secrets["google_sheets"]["client_id"],
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
         "token_uri": "https://accounts.google.com/o/oauth2/token",
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": secrets["google_sheets"]["client_x509_cert_url"]
+        "client_x509_cert_url": st.secrets["google_sheets"]["client_x509_cert_url"]
     }, scope)
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
