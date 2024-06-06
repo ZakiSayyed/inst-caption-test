@@ -384,4 +384,11 @@ if not st.session_state.logged_in:
 else:
     main(st.session_state.username, st.session_state.password)
 
-st.markdown("<h1 style='text-align: center; font-size: 15px;'>Support \nautomatexpos.gmail.com</h1>", unsafe_allow_html=True)
+st.write("<br>", unsafe_allow_html=True)
+st.write("<br>", unsafe_allow_html=True)
+st.write("<br>", unsafe_allow_html=True)
+st.write("<br>", unsafe_allow_html=True)
+st.write("<br>", unsafe_allow_html=True)
+st.write("<br>", unsafe_allow_html=True)
+
+st.markdown("<h1 style='text-align: center; font-size: 15px;'>Support Email: automatexpos.gmail.com</h1>", unsafe_allow_html=True)
