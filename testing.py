@@ -244,13 +244,13 @@ def check_user(username, password):
     for user in users:
         if user['Username'] == username and user['Password'] == password and user['Count'] == 2:
             return 'limit'
-        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
+        elif user['Username'] == username and user['Password'] == password and user['Count'] < 2 and user['Status'] == 'verified':
             return True
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
             return 'pending'
     return False
 
-def signup_add_user(username, password, sender_email):
+def signup_add_user(username, password, sender_email, status):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict({
         "type": "service_account",
@@ -267,16 +267,16 @@ def signup_add_user(username, password, sender_email):
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
-    sheet.append_row([username, password, 0, sender_email, 'pending'])  # Update the count in the sheet (i + 2 to account for header)
+    sheet.append_row([username, password, 0, sender_email, status])  # Update the count in the sheet (i + 2 to account for header)
     return True
 
 
-def signup_user(username, password, sender_email):
+def signup_user(username, password, sender_email, status):
     users = sheet
     for user in users:
         if user['Username'] == username:
             return False  # Username already exists
-    signup_add_user(username, password, sender_email)
+    signup_add_user(username, password, sender_email, status)
     # sheet.append_row([username, password, 0, sender_email])
     return True
 
@@ -334,7 +334,7 @@ if not st.session_state.logged_in:
         subscription_type = st.radio("Select Subscription Type", ["Free Trial (2 Captions only)", "Paid Subscription"])
 
         sender_email_1 = None  # Define sender_email_1 here
-
+        status = 'pending'
         if subscription_type == "Paid Subscription":
             payment_type = st.radio("Select Payment Type", ["Crypto - USDT", "Paypal"])
             if payment_type == "Crypto - USDT":
@@ -348,11 +348,13 @@ if not st.session_state.logged_in:
                 st.subheader("Pay to : xyz@gmail.com")
                 # st.markdown("<h1 style='text-align: left; font-size: 20px;'>Email : xyz@gmail.com.</h1>", unsafe_allow_html=True)
                 sender_email_1 = st.text_input("Sender Email (For confirmation)")
+        else:
+            status = 'verified'
 
         if st.button("Signup"):
             sender_email = sender_email_1
             if new_username and new_password:
-                if signup_user(new_username, new_password,sender_email):
+                if signup_user(new_username, new_password,sender_email, status):
                     with st.spinner('Please wait while your payment is being processed...'):
                         time.sleep(5)
                     st.success('Congratulations! You have signed up for the account.')
@@ -363,6 +365,7 @@ if not st.session_state.logged_in:
                     st.error("Username already exists. Please choose a different username.")
             else:
                 st.error("Please enter a username and password")
+
     elif choice == "Login":
         st.subheader("Login to your account")
         username = st.text_input("Username")
