@@ -9,6 +9,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
+from email.mime.image import MIMEImage
 
 smtp_server = 'smtp.mail.yahoo.com'
 smtp_port = 587  # or 465 for SSL
@@ -19,7 +20,8 @@ st.markdown("<h1 style='text-align: center;'>Instagram Caption Generator</h1>", 
 st.markdown("<h1 style='text-align: center; font-size: 20px;'>Use AI to generate captions for any images.</h1>", unsafe_allow_html=True)
 st.write("<br>", unsafe_allow_html=True)
 
-def send_email(subject, message, to_email):
+
+def send_email(subject, message, to_email, image_filename, image_data):
     # Create message container
     msg = MIMEMultipart()
     msg['From'] = yahoo_email
@@ -28,6 +30,13 @@ def send_email(subject, message, to_email):
 
     # Attach message
     msg.attach(MIMEText(message, 'plain'))
+
+    try:
+        img = MIMEImage(image_data)
+        img.add_header('Content-Disposition', 'attachment', filename=image_filename)
+        msg.attach(img)
+    except Exception as e:
+        print(f"Error attaching image: {e}")
 
     try:
         # Establish a secure session with the SMTP server
@@ -399,7 +408,7 @@ if 'username' not in st.session_state:
 if 'password' not in st.session_state:
     st.session_state.password = None
 
-menu = ["Signup", "Login"]
+menu = ["Signup", "Login", "Support"]
 
 # Use the index of the default choice in the options list
 default_index = 1  # Index of "Login" in menu (starts from 0)
@@ -440,7 +449,6 @@ if not st.session_state.logged_in:
                     email_subject = 'New user signup'
                     current_time = datetime.now()
                     print(current_time)
-                    input("ent to con")
                     email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
                     send_email(email_subject, email_message, recipient_email)
                     
@@ -471,13 +479,47 @@ if not st.session_state.logged_in:
                 time.sleep(3)
                 st.rerun()
             elif state == 'limit':
-                st.error("Sorry, Limit Exceeded. Please purchase the plan to use the tool")
-                st.error("Contact support email to purchase the plan, please add your username in the email")
+                st.error("Sorry, Limit Exceeded. Please subscribe to use the tool")
+                st.error("Contact support to purchase the plan, please add your username in the email")
             elif state == 'pending':
                 st.error("Sorry, Your payment is still pending. Please wait..")
                 st.error("Contact support email if payment is not verified within 5 minutes, kindly share your username and payment confirmation screenshot")
             else:
                 st.error("Invalid username or password")
+
+    elif choice == "Support":
+        st.subheader("Welcome to Support")
+        ticket_type = st.radio("Select Ticket Type", ["Subscription Request", "Issue"])
+        if ticket_type == "Issue":
+            support_email_sender = st.text_input("Please enter your email address")
+            email_text = st.text_input("Please enter your query")
+            if st.button("Send"):
+                recipient_email = 'automatexpos@gmail.com'
+                email_subject = 'New Ticket'
+                current_time = datetime.now()
+                print(current_time)
+                email_message = f'A new ticket has been opened\n\nTime : {current_time}\nEmail address : {support_email_sender}\nQuestion : {email_text}'
+                send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
+                with st.spinner("Creating ticket..."):
+                    time.sleep(3)
+                st.success("Your ticket has been received, a support agent will get back to you soon")
+                st.rerun()
+        elif ticket_type == "Subscription Request":
+            support_email_sender = st.text_input("Please enter your email address")
+            support_username_sender = st.text_input("Please enter your Username")
+            image_filename, image_data, base64_image = upload_image()
+            if st.button("Send"):    
+                recipient_email = 'automatexpos@gmail.com'
+                email_subject = 'New Subscription Request'
+                current_time = datetime.now()
+                print(current_time)
+                email_message = f'A new ticket has been opened\n\nTime : {current_time}\nEmail address : {support_email_sender}\nUsername : {support_username_sender}'
+                send_email(email_subject, email_message, recipient_email, image_filename, image_data)
+                with st.spinner("Creating ticket..."):
+                    time.sleep(3)
+                st.success("Your request has been received, a support agent will get back to you soon")
+                st.rerun()            
+            
 else:
     main(st.session_state.username, st.session_state.password)
 
