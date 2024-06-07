@@ -124,8 +124,8 @@ def generate_caption(image_filename, image_data, vibe, prompt, username, passwor
         state = check_user(username, password)
         
         if state == 'limit':
-            st.error("Sorry, Limit Exceeded. Please purchase the plan to use the tool")
-            st.error("Contact support email to purchase the plan, please add your username in the email")
+            st.error("Sorry, Limit Exceeded. Please Subscribe to use the tool")
+            st.error("Contact Support to Subscribe")
             with st.spinner('Logging out...'):
                 time.sleep(5)
             st.session_state.logged_in = False
@@ -501,10 +501,10 @@ if not st.session_state.logged_in:
                 st.rerun()
             elif state == 'limit':
                 st.error("Sorry, Limit Exceeded. Please subscribe to use the tool")
-                st.error("Contact support to purchase the plan, please add your username in the email")
+                st.error("Contact Support to Subscribe")
             elif state == 'pending':
                 st.error("Sorry, Your payment is still pending. Please wait..")
-                st.error("Contact support email if payment is not verified within 5 minutes, kindly share your username and payment confirmation screenshot")
+                st.error("Contact Support if payment is not verified within 5 minutes. Please share your username and payment confirmation screenshot")
             else:
                 st.error("Invalid username or password")
 
