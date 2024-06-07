@@ -296,9 +296,9 @@ def check_user(username, password):
     users = sheet
 
     for user in users:
-        if user['Username'] == username and user['Password'] == password and user['Count'] >= '1' and user['Status'] == 'trial':
+        if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial':
             return 'limit'
-        if user['Username'] == username and user['Password'] == password and user['Count'] <= '2' and user['Status'] == 'trial':
+        if user['Username'] == username and user['Password'] == password and user['Count'] <= 2 and user['Status'] == 'trial':
             return True        
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
             return True
