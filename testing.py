@@ -515,28 +515,26 @@ if not st.session_state.logged_in:
             support_email_sender = st.text_input("Please enter your email address")
             email_text = st.text_input("Please enter your query")
             if st.button("Send"):
-                recipient_email = 'automatexpos@gmail.com'
-                email_subject = 'New Ticket'
-                current_time = datetime.now()
-                print(current_time)
-                email_message = f'A new ticket has been opened\n\nTime : {current_time}\nEmail address : {support_email_sender}\nQuestion : {email_text}'
-                send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
                 with st.spinner("Creating ticket..."):
-                    time.sleep(3)
+                    recipient_email = 'automatexpos@gmail.com'
+                    email_subject = 'New Ticket'
+                    current_time = datetime.now()
+                    print(current_time)
+                    email_message = f'A new ticket has been opened\n\nTime : {current_time}\nEmail address : {support_email_sender}\nQuestion : {email_text}'
+                    send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
                 st.success("Your ticket has been received, a support agent will get back to you soon")
         elif ticket_type == "Subscription Request":
             support_email_sender = st.text_input("Please enter your email address")
             support_username_sender = st.text_input("Please enter your Username")
             image_filename, image_data, base64_image = upload_image()
             if st.button("Send"):    
-                recipient_email = 'automatexpos@gmail.com'
-                email_subject = 'New Subscription Request'
-                current_time = datetime.now()
-                print(current_time)
-                email_message = f'A new ticket has been opened\n\nTime : {current_time}\nEmail address : {support_email_sender}\nUsername : {support_username_sender}'
-                send_email(email_subject, email_message, recipient_email, image_filename, image_data)
                 with st.spinner("Creating ticket..."):
-                    time.sleep(3)
+                    recipient_email = 'automatexpos@gmail.com'
+                    email_subject = 'New Subscription Request'
+                    current_time = datetime.now()
+                    print(current_time)
+                    email_message = f'A new ticket has been opened\n\nTime : {current_time}\nEmail address : {support_email_sender}\nUsername : {support_username_sender}'
+                    send_email(email_subject, email_message, recipient_email, image_filename, image_data)
                 st.success("Your request has been received, a support agent will get back to you soon")
             
 else:
