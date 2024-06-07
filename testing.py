@@ -323,7 +323,7 @@ def signup_add_user(username, password, sender_email, status):
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
-    sheet.append_row([username, password, 0, sender_email, status]) 
+    sheet.append_row([username, password, 0, sender_email, status, 0]) 
     return True
 
 
@@ -450,7 +450,7 @@ if not st.session_state.logged_in:
                     current_time = datetime.now()
                     print(current_time)
                     email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
-                    send_email(email_subject, email_message, recipient_email)
+                    send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
                     
                     with st.spinner('Please wait while your payment is being processed...'):
                         time.sleep(5)
