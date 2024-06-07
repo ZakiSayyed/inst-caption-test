@@ -5,14 +5,54 @@ import requests
 import base64
 import os
 import time
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
-# secrets = toml.load("secrets.toml")
-# secrets = toml.load("D:\Fiverr\Signup-Login Streamlit test\Test\.streamlit\secrets.toml")
-
+smtp_server = 'smtp.mail.yahoo.com'
+smtp_port = 587  # or 465 for SSL
+yahoo_email = st.secrets["yahoo_email"]
+yahoo_password = st.secrets["yahoo_pass"]
 
 st.markdown("<h1 style='text-align: center;'>Instagram Caption Generator</h1>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center; font-size: 20px;'>Use AI to generate captions for any images.</h1>", unsafe_allow_html=True)
 st.write("<br>", unsafe_allow_html=True)
+
+def send_email(subject, message, to_email):
+    # Create message container
+    msg = MIMEMultipart()
+    msg['From'] = yahoo_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    # Attach message
+    msg.attach(MIMEText(message, 'plain'))
+
+    try:
+        # Establish a secure session with the SMTP server
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        
+        # Login using your Yahoo email and password
+        server.login(yahoo_email, yahoo_password)
+
+        # Send the email
+        server.sendmail(yahoo_email, to_email, msg.as_string())
+        print("Email sent successfully!")
+
+    except smtplib.SMTPException as e:
+        print(f"Error: {e}")
+
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+    finally:
+        # Quit the server
+        try:
+            if server:
+                server.quit()
+        except Exception as e:
+            print(f"Error while quitting server: {e}")
 
 def is_file_size_acceptable(file, max_size):
     return file.size <= max_size  
@@ -363,7 +403,11 @@ if not st.session_state.logged_in:
             if new_username and new_password:
                 if signup_user(new_username, new_password,sender_email, status):
                     st.success('Congratulations! You have signed up for the account.')
-
+                    recipient_email = 'szaki1871993@gmail.com'
+                    email_subject = 'New user signup'
+                    email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}'
+                    send_email(email_subject, email_message, recipient_email)
+                    
                     with st.spinner('Please wait while your payment is being processed...'):
                         time.sleep(5)
                     st.success('You can log in to continue once your payment is verified.')
