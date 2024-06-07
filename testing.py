@@ -432,6 +432,28 @@ if not st.session_state.logged_in:
                 st.markdown("<h1 style='text-align: left; font-size: 25px;'>Wallet Address</h1>", unsafe_allow_html=True)
                 st.markdown("<h1 style='text-align: left; font-size: 20px;'>0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1</h1>", unsafe_allow_html=True)
 
+                if st.button("Signup"):
+                    sender_email = sender_email_1
+                    if new_username and new_password:
+                        if signup_user(new_username, new_password,sender_email, status):
+                            st.success('Congratulations! You have signed up for the account.')
+                            recipient_email = 'szaki1871993@gmail.com'
+                            email_subject = 'New user signup'
+                            current_time = datetime.now()
+                            print(current_time)
+                            email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
+                            send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
+                            
+                            with st.spinner('Please wait while your payment is being processed...'):
+                                time.sleep(5)
+                            st.success('You can log in to continue once your payment is verified.')
+                            time.sleep(5)
+                            st.rerun()
+                        else:
+                            st.error("Username already exists. Please choose a different username.")
+                    else:
+                        st.error("Please enter a username and password")
+
                 # st.im("",caption="0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1")
             else:
                 st.subheader("Pay to : xyz@gmail.com")
@@ -440,27 +462,26 @@ if not st.session_state.logged_in:
         else:
             status = 'trial'
 
-        if st.button("Signup"):
-            sender_email = sender_email_1
-            if new_username and new_password:
-                if signup_user(new_username, new_password,sender_email, status):
-                    st.success('Congratulations! You have signed up for the account.')
-                    recipient_email = 'szaki1871993@gmail.com'
-                    email_subject = 'New user signup'
-                    current_time = datetime.now()
-                    print(current_time)
-                    email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
-                    send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
-                    
-                    with st.spinner('Please wait while your payment is being processed...'):
+            if st.button("Signup"):
+                sender_email = sender_email_1
+                if new_username and new_password:
+                    if signup_user(new_username, new_password,sender_email, status):
+                        with st.spinner('Creating Trial Account...'):
+                            time.sleep(5)
+                        st.success('Congratulations! You have signed up for the Trial account.')
+                        recipient_email = 'szaki1871993@gmail.com'
+                        email_subject = 'New user signup'
+                        current_time = datetime.now()
+                        print(current_time)
+                        email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
+                        send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
+                        st.success('You can log in to generate 1 caption')
                         time.sleep(5)
-                    st.success('You can log in to continue once your payment is verified.')
-                    time.sleep(5)
-                    st.rerun()
+                        st.rerun()
+                    else:
+                        st.error("Username already exists. Please choose a different username.")
                 else:
-                    st.error("Username already exists. Please choose a different username.")
-            else:
-                st.error("Please enter a username and password")
+                    st.error("Please enter a username and password")
 
     elif choice == "Login":
         st.subheader("Login to your account")
