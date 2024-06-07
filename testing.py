@@ -482,7 +482,7 @@ if not st.session_state.logged_in:
                         if new_username and new_password:
                             if signup_user(new_username, new_password, sender_email, status, st.session_state.new_email):
                                 st.success('Congratulations! You have signed up for the account.')
-                                recipient_email = 'szaki1871993@gmail.com'
+                                recipient_email = 'automatexpos@gmail.com'
                                 email_subject = 'New user signup'
                                 current_time = datetime.now()
                                 print(current_time)
@@ -595,7 +595,7 @@ if not st.session_state.logged_in:
 
         if 'button_pressed' not in st.session_state:
             st.session_state.button_pressed = False
-                    
+
         if ticket_type == "Issue":
             support_email_sender = st.text_input("Please enter your email address")
             email_text = st.text_input("Please enter your query")
@@ -603,13 +603,11 @@ if not st.session_state.logged_in:
             if st.session_state.button_pressed:
                 st.warning("You have already submitted your request.")
             else:
-                    
-                if st.button("Send"):
+                if st.button("Send", disabled=not (support_email_sender and email_text)):
                     with st.spinner("Creating ticket..."):
                         recipient_email = 'automatexpos@gmail.com'
                         email_subject = 'New Ticket'
                         current_time = datetime.now()
-                        print(current_time)
                         email_message = f'A new ticket has been opened\n\nTime : {current_time}\nEmail address : {support_email_sender}\nQuestion : {email_text}'
                         send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
 
@@ -622,20 +620,19 @@ if not st.session_state.logged_in:
             support_email_sender = st.text_input("Please enter your email address")
             support_username_sender = st.text_input("Please enter your Username")
             image_filename, image_data, base64_image = upload_image()
+
             if st.session_state.button_pressed:
                 st.warning("You have already submitted your request.")
             else:
-
-                if st.button("Send") and not st.session_state.button_pressed:    
+                if st.button("Send", disabled=not (support_email_sender and support_username_sender and image_filename)):
                     with st.spinner("Creating ticket..."):
                         recipient_email = 'automatexpos@gmail.com'
                         email_subject = 'New Subscription Request'
                         current_time = datetime.now()
-                        print(current_time)
                         email_message = f'A new ticket has been opened\n\nTime : {current_time}\nEmail address : {support_email_sender}\nUsername : {support_username_sender}'
                         send_email(email_subject, email_message, recipient_email, image_filename, image_data)
+                    
                     st.session_state.button_pressed = True
-                        
                     st.success("Your request has been received, a support agent will get back to you soon")
                 elif st.session_state.button_pressed:
                     st.warning("You have already submitted your request.")
