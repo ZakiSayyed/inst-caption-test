@@ -524,7 +524,6 @@ if not st.session_state.logged_in:
                 with st.spinner("Creating ticket..."):
                     time.sleep(3)
                 st.success("Your ticket has been received, a support agent will get back to you soon")
-                st.rerun()
         elif ticket_type == "Subscription Request":
             support_email_sender = st.text_input("Please enter your email address")
             support_username_sender = st.text_input("Please enter your Username")
@@ -539,7 +538,6 @@ if not st.session_state.logged_in:
                 with st.spinner("Creating ticket..."):
                     time.sleep(3)
                 st.success("Your request has been received, a support agent will get back to you soon")
-                st.rerun()            
             
 else:
     main(st.session_state.username, st.session_state.password)
