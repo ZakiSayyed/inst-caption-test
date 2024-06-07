@@ -8,6 +8,7 @@ import time
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from datetime import datetime
 
 smtp_server = 'smtp.mail.yahoo.com'
 smtp_port = 587  # or 465 for SSL
@@ -123,7 +124,7 @@ def generate_caption(image_filename, image_data, vibe, prompt, username, passwor
         
         else:
 
-            login_count(username, password)
+            captions_generated_count(username, password)
 
             if image_filename is not None and image_data is not None:
 
@@ -326,7 +327,7 @@ def signup_user(username, password, sender_email, status):
     # sheet.append_row([username, password, 0, sender_email])
     return True
 
-def update_celll(i, user):
+def update_caption_count(i, user):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict({
         "type": "service_account",
@@ -347,13 +348,45 @@ def update_celll(i, user):
     sheet.update_cell(i + 2, 3, new_count)  # Update the count in the sheet (i + 2 to account for header)
     return True
 
+def update_login_count(i, user):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict({
+        "type": "service_account",
+        "project_id": st.secrets["google_sheets"]["project_id"],
+        "private_key_id": st.secrets["google_sheets"]["private_key_id"],
+        "private_key": st.secrets["google_sheets"]["private_key"],
+        "client_email": st.secrets["google_sheets"]["client_email"],
+        "client_id": st.secrets["google_sheets"]["client_id"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": st.secrets["google_sheets"]["client_x509_cert_url"]
+    }, scope)
+    client = gspread.authorize(creds)
+    sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
+    sheet = client.open_by_key(sheet_id).sheet1
+    new_count = user['Logins'] + 1
+    sheet.update_cell(i + 2, 6, new_count)  # Update the count in the sheet (i + 2 to account for header)
+    last_login = str(datetime.now())
+    sheet.update_cell(i + 2, 7, last_login)  # Update the count in the sheet (i + 2 to account for header)
+
+    return True
 
 def login_count(username, password):
     users = sheet
     for i, user in enumerate(users):
         if user['Username'] == username and user['Password'] == password:
             # Increment the login count
-            update_celll(i, user)
+            update_login_count(i, user)
+            
+    return False  # Username or password incorrect
+
+def captions_generated_count(username, password):
+    users = sheet
+    for i, user in enumerate(users):
+        if user['Username'] == username and user['Password'] == password:
+            # Increment the login count
+            update_caption_count(i, user)
             
     return False  # Username or password incorrect
 
@@ -405,7 +438,10 @@ if not st.session_state.logged_in:
                     st.success('Congratulations! You have signed up for the account.')
                     recipient_email = 'szaki1871993@gmail.com'
                     email_subject = 'New user signup'
-                    email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}'
+                    current_time = datetime.now()
+                    print(current_time)
+                    input("ent to con")
+                    email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
                     send_email(email_subject, email_message, recipient_email)
                     
                     with st.spinner('Please wait while your payment is being processed...'):
@@ -431,6 +467,7 @@ if not st.session_state.logged_in:
                 with st.spinner("Logging in..."):
                     time.sleep(5)                
                 st.success(f"Welcome back {username}!")
+                login_count(username, password)
                 time.sleep(3)
                 st.rerun()
             elif state == 'limit':
