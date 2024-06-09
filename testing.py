@@ -764,7 +764,7 @@ if not st.session_state.logged_in:
                             with st.spinner('Creating Trial Account...'):
                                 time.sleep(5)
                             st.success('Congratulations! You have signed up for the Trial account.')
-                            recipient_email = 'szaki1871993@gmail.com'
+                            recipient_email = 'automatexpos@gmail.com'
                             email_subject = 'New user signup'
                             current_time = datetime.now()
                             print(current_time)
