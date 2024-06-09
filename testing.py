@@ -296,7 +296,7 @@ def generate_caption(image_filename, image_data, vibe, prompt, username, passwor
     if st.button("Generate Captions"):
         state = check_user(username, password)
         
-        if state == 'limit':
+        if state == 'limit' or state == 'limit3':
             st.error("Sorry, Limit Exceeded. Please Subscribe to use the tool")
             st.error("Contact Support to Subscribe")
             with st.spinner('Logging out...'):
@@ -469,7 +469,7 @@ def check_user(username, password):
     for user in users:
         if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial' and user['Promo Code Status'] == 'unverified':
             return 'limit'
-        if user['Username'] == username and user['Password'] == password and user['Count'] >= 3 and user['Status'] == 'trial' and user['Promo Code Status'] == 'verified':
+        if user['Username'] == username and user['Password'] == password and user['Count'] == 3 and user['Status'] == 'trial' and user['Promo Code Status'] == 'verified':
             return 'limit3'        
         if user['Username'] == username and user['Password'] == password and user['Count'] <= 2 and user['Status'] == 'trial':
             return True        
@@ -770,7 +770,6 @@ if not st.session_state.logged_in:
                             print(current_time)
                             email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
                             send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
-                            st.success('You can log in to generate 1 caption')
                             time.sleep(5)
                             st.session_state.signup_stage = None
                             st.rerun()
