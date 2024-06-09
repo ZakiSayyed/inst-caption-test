@@ -760,7 +760,7 @@ if not st.session_state.logged_in:
 
                 if st.button("Proceed"):
                     if new_username and new_password:
-                        if signup_user(new_username, new_password, sender_email, status, st.session_state.new_email):
+                        if signup_user(new_username, new_password, sender_email, status, st.session_state.new_email, st.session_state.promo_code):
                             with st.spinner('Creating Trial Account...'):
                                 time.sleep(5)
                             st.success('Congratulations! You have signed up for the Trial account.')
