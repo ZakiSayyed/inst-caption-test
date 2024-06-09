@@ -22,6 +22,177 @@ st.markdown("<h1 style='text-align: center;'>Instagram Caption Generator</h1>", 
 st.markdown("<h1 style='text-align: center; font-size: 20px;'>Use AI to generate captions for any images.</h1>", unsafe_allow_html=True)
 st.write("<br>", unsafe_allow_html=True)
 
+def croc_game():
+    # Initialize game state
+    if 'game_state' not in st.session_state:
+        st.session_state.game_state = {
+            'teeth': [True] * 5,  # All 5 teeth are initially up (True)
+            'game_over': False,
+            'winning_tooth': random.randint(0, 4),  # Random tooth that will close the mouth (0-4 for 5 teeth)
+            'teeth_down': 0,  # Counter for teeth put down
+            'tries_left': 3,  # User starts with 3 tries
+            'user_won': False,  # Track if the user has won
+            'promo_code': None,  # Store the promo code
+            'game_started': False  # Track if the game has started
+        }
+
+    def generate_promo_code():
+        return f"AX{random.randint(0, 9999):04}"
+
+    def add_promo_code(promo, email_address_game):
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        creds = ServiceAccountCredentials.from_json_keyfile_dict({
+            "type": "service_account",
+            "project_id": st.secrets["google_sheets"]["project_id"],
+            "private_key_id": st.secrets["google_sheets"]["private_key_id"],
+            "private_key": st.secrets["google_sheets"]["private_key"],
+            "client_email": st.secrets["google_sheets"]["client_email"],
+            "client_id": st.secrets["google_sheets"]["client_id"],
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://accounts.google.com/o/oauth2/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": st.secrets["google_sheets"]["client_x509_cert_url"]
+        }, scope)
+        client = gspread.authorize(creds)
+        sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
+        sheet = client.open_by_key(sheet_id).get_worksheet(1)
+        sheet.append_row([promo, email_address_game])
+        return True
+
+    def load_google_sheets_credentials():
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        creds = ServiceAccountCredentials.from_json_keyfile_dict({
+            "type": "service_account",
+            "project_id": st.secrets["google_sheets"]["project_id"],
+            "private_key_id": st.secrets["google_sheets"]["private_key_id"],
+            "private_key": st.secrets["google_sheets"]["private_key"],
+            "client_email": st.secrets["google_sheets"]["client_email"],
+            "client_id": st.secrets["google_sheets"]["client_id"],
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://accounts.google.com/o/oauth2/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": st.secrets["google_sheets"]["client_x509_cert_url"]
+        }, scope)
+        client = gspread.authorize(creds)
+        sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
+        sheet = client.open_by_key(sheet_id).get_worksheet(1)
+        all_records = sheet.get_all_records()  # Use get_all_values instead
+        return all_records
+        
+    sheet = load_google_sheets_credentials()
+
+    def check_email(email_address_game):
+        users = sheet
+        print(users)
+        print(email_address_game)
+        for user in users:
+            if user['Email'] == email_address_game:
+                print("Email used")
+                return 'used'
+        print("Email not used")
+        return True
+            
+    def reset_game():
+        """Function to reset the game."""
+        if st.session_state.game_state['tries_left'] > 0 and not st.session_state.game_state['user_won']:
+            st.session_state.game_state = {
+                'teeth': [True] * 5,
+                'game_over': False,
+                'winning_tooth': random.randint(0, 4),
+                'teeth_down': 0,
+                'tries_left': st.session_state.game_state['tries_left'],
+                'user_won': False,
+                'promo_code': None,
+                'game_started': True
+            }
+
+    def press_tooth(index):
+        """Function to handle tooth press."""
+        if st.session_state.game_state['game_over'] or st.session_state.game_state['user_won']:
+            return
+
+        if index == st.session_state.game_state['winning_tooth']:
+            st.session_state.game_state['game_over'] = True
+            st.session_state.game_state['tries_left'] -= 1
+        else:
+            st.session_state.game_state['teeth'][index] = False
+            st.session_state.game_state['teeth_down'] += 1
+            if st.session_state.game_state['teeth_down'] == 4:
+                st.session_state.game_state['game_over'] = True
+                st.session_state.game_state['user_won'] = True
+                promo_code = generate_promo_code()
+                st.session_state.game_state['promo_code'] = promo_code
+                add_promo_code(promo_code, st.session_state.email_address_game)
+
+    st.title("Crocodile Dentist Game 🐊")
+
+    st.write("Click on the teeth to put them down one by one. Be careful, one of them will close the mouth!")
+
+    email_address_game = st.text_input("Enter your Email address to play the game", key="email_address_game")
+
+    if email_address_game:
+        if st.button("Play Game"):
+            status = check_email(email_address_game)
+            if status == 'used':
+                st.error("Email address already used")
+                time.sleep(5)
+                st.rerun()
+            else:
+                st.session_state.game_state['game_started'] = True
+
+        if st.session_state.game_state['game_started']:
+            # Display remaining tries
+            if st.session_state.game_state['tries_left'] > 0:
+                st.info(f"Tries left: {st.session_state.game_state['tries_left']}")
+            else:
+                st.error("No more tries left. You cannot play again this session.")
+
+            # Display crocodile's mouth status
+            if st.session_state.game_state['game_over']:
+                if st.session_state.game_state['teeth_down'] == 4:
+                    st.success("🎉 Congratulations, you have been rewarded with 2 Free captions! 🏆")
+                    st.session_state.game_state['user_won'] = True
+                    st.balloons()
+                    promo_code = st.session_state.game_state['promo_code']
+                    st.write(f"Use the promo code **{promo_code}** while signing up to win free 5 captions.")
+                else:
+                    st.error("😬 Oops! The crocodile's mouth closed! 🐊")
+                    if st.session_state.game_state['tries_left'] > 0:
+                        if st.button("Play Again"):
+                            reset_game()
+                    else:
+                        st.warning("No more tries left for this session.")
+            else:
+                st.info("Crocodile's mouth is open. Proceed with caution!")
+
+            # Display teeth as buttons
+            if not st.session_state.game_state['user_won'] and st.session_state.game_state['tries_left'] > 0:
+                cols = st.columns(5)
+                for i in range(5):
+                    with cols[i % 5]:
+                        tooth_status = st.session_state.game_state['teeth'][i]
+                        if tooth_status:
+                            if st.button(f"🦷 Tooth {i+1}", key=f"tooth_{i}", on_click=press_tooth, args=(i,)):
+                                pass
+                        else:
+                            st.button(f"🦷 Tooth {i+1}", key=f"tooth_{i}", disabled=True, help="This tooth is already pressed down.")
+
+            # Display teeth status
+            teeth_display = []
+            for i in range(5):
+                if st.session_state.game_state['teeth'][i]:
+                    teeth_display.append("🦷")
+                else:
+                    teeth_display.append("❌")
+
+            st.write(" ".join(teeth_display))
+
+            # Display a reminder or result message
+            if not st.session_state.game_state['game_over']:
+                st.write("Keep going, press another tooth! 🦷")
+    else:
+        st.warning("Please enter your email address to play the game.")
+
 
 def send_email(subject, message, to_email, image_filename, image_data):
     # Create message container
@@ -292,14 +463,14 @@ def load_google_sheets_credentials():
 sheet = load_google_sheets_credentials()
 
 # Define the expected headers explicitly
-expected_headers = ['Username', 'Password', 'Count', 'Sender', 'Status']
-
 def check_user(username, password):
     users = sheet
 
     for user in users:
-        if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial':
+        if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial' and user['Promo Code Status'] == 'unverified':
             return 'limit'
+        if user['Username'] == username and user['Password'] == password and user['Count'] >= 3 and user['Status'] == 'trial' and user['Promo Code Status'] == 'verified':
+            return 'limit3'        
         if user['Username'] == username and user['Password'] == password and user['Count'] <= 2 and user['Status'] == 'trial':
             return True        
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
@@ -308,7 +479,7 @@ def check_user(username, password):
             return 'pending'
     return False
 
-def signup_add_user(username, password, sender_email, status, email):
+def signup_add_user(username, password, sender_email, status, email, promo_code_status):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict({
         "type": "service_account",
@@ -325,16 +496,16 @@ def signup_add_user(username, password, sender_email, status, email):
     client = gspread.authorize(creds)
     sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
     sheet = client.open_by_key(sheet_id).sheet1
-    sheet.append_row([username, password, 0, sender_email, status, 0, 0, email]) 
+    sheet.append_row([username, password, 0, sender_email, status, 0, 0, email, promo_code_status]) 
     return True
 
 
-def signup_user(username, password, sender_email, status, email):
+def signup_user(username, password, sender_email, status, email, promo_code_status):
     users = sheet
     for user in users:
         if user['Username'] == username:
             return False  # Username already exists
-    signup_add_user(username, password, sender_email, status, email)
+    signup_add_user(username, password, sender_email, status, email, promo_code_status)
     # sheet.append_row([username, password, 0, sender_email])
     return True
 
@@ -391,6 +562,39 @@ def update_login_count(i, user):
 
     return True
 
+def load_google_sheets_credentials():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict({
+        "type": "service_account",
+        "project_id": st.secrets["google_sheets"]["project_id"],
+        "private_key_id": st.secrets["google_sheets"]["private_key_id"],
+        "private_key": st.secrets["google_sheets"]["private_key"],
+        "client_email": st.secrets["google_sheets"]["client_email"],
+        "client_id": st.secrets["google_sheets"]["client_id"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": st.secrets["google_sheets"]["client_x509_cert_url"]
+    }, scope)
+    client = gspread.authorize(creds)
+    sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
+    sheet = client.open_by_key(sheet_id).get_worksheet(1)
+    all_records = sheet.get_all_records()  # Use get_all_values instead
+    return all_records
+    
+promo_sheet = load_google_sheets_credentials()
+
+def check_promo(promo_code, email_address_game):
+    users = promo_sheet
+    print(users)
+    print(email_address_game)
+    for user in users:
+        if user['Promo'] == promo_code and user['Email'] == email_address_game:
+            print("Promo Code Matched")
+            return True
+    print("Promo Code does not match")
+    return False
+
 def login_count(username, password):
     users = sheet
     for i, user in enumerate(users):
@@ -421,7 +625,7 @@ if 'username' not in st.session_state:
 if 'password' not in st.session_state:
     st.session_state.password = None
 
-menu = ["Signup", "Login", "Support"]
+menu = ["Signup", "Login", "Support", "Win Free Captions"]
 
 # Use the index of the default choice in the options list
 default_index = 1  # Index of "Login" in menu (starts from 0)
@@ -431,6 +635,16 @@ if not st.session_state.logged_in:
     if choice == "Signup":
         st.subheader("Create a new account")
         st.session_state.new_email = st.text_input("Email Address")
+        st.session_state.promo_code = st.text_input("Enter Promo Code (Optional)")
+        st.button("Verify Promo Code")
+        promo_code_status = 'unverified'
+        if st.session_state.promo_code and st.session_state.new_email:
+            if check_promo(st.session_state.promo_code, st.session_state.new_email):
+                st.success("Promo code verified")
+                promo_code_status = 'verified'
+            else:
+                st.error("Promo code does not match")
+
         subscription_type = st.radio("Select Subscription Type", ["Free Trial (1 Caption only)", "Paid Subscription"])
 
         sender_email_1 = None  # Define sender_email_1 here
@@ -480,7 +694,7 @@ if not st.session_state.logged_in:
 
                     if st.button("Proceed"):
                         if new_username and new_password:
-                            if signup_user(new_username, new_password, sender_email, status, st.session_state.new_email):
+                            if signup_user(new_username, new_password, sender_email, status, st.session_state.new_email, promo_code_status):
                                 st.success('Congratulations! You have signed up for the account.')
                                 recipient_email = 'automatexpos@gmail.com'
                                 email_subject = 'New user signup'
@@ -494,6 +708,8 @@ if not st.session_state.logged_in:
                                 st.success('You can log in to continue once your payment is verified.')
                                 time.sleep(5)
                                 st.session_state.signup_stage = None
+                                default_index = 1  # Index of "Login" in menu (starts from 0)
+                                choice = st.sidebar.selectbox("Menu", menu, index=default_index)
                                 st.rerun()
                             else:
                                 st.error("Username already exists. Please choose a different username.")
@@ -586,8 +802,15 @@ if not st.session_state.logged_in:
             elif state == 'pending':
                 st.error("Sorry, Your payment is still pending. Please wait..")
                 st.error("Contact Support if payment is not verified within 5 minutes. Please share your username and payment confirmation screenshot")
+            elif state == 'limit3':
+                st.error("Sorry, Limit Exceeded. Please subscribe to use the tool")
+                st.error("Contact Support to Subscribe")                
             else:
                 st.error("Invalid username or password")
+
+    elif choice == "Win Free Captions":
+        croc_game()
+        print("Crocodile Game")
 
     elif choice == "Support":
         st.subheader("Welcome to Support")
@@ -636,7 +859,9 @@ if not st.session_state.logged_in:
                     st.success("Your request has been received, a support agent will get back to you soon")
                 elif st.session_state.button_pressed:
                     st.warning("You have already submitted your request.")
-            
+
+
+
 else:
     main(st.session_state.username, st.session_state.password)
 
