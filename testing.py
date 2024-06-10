@@ -450,11 +450,23 @@ def tries_left(username, password):
             return 0
     return False
 
-
+def account_status(username,password):
+    users = sheet
+    for user in users:
+        if user['Username'] == username and user['Password'] == password and user['Status'] == 'trial':
+            return 'trial'
+        elif user['Username'] == username and user['Password'] == password  and user['Status'] == 'verified':
+            return 'verified'   
+        
 def main(username,password):
 
     remaining_captions = tries_left(username,password)
     st.markdown(f"Captions Remaining : {remaining_captions}")
+    account_state = account_status(username, password)
+    if account_state == 'trial':
+        st.markdown("Account : Trial")
+    elif account_state == 'verified':
+        st.markdown("Account : Paid")
 
     image_filename, image_data, base64_image = upload_image()
     
