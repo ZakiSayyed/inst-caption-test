@@ -617,6 +617,11 @@ def generate_otp():
     otp = str(random.randint(1000, 9999))  # Generate a 4-digit OTP
     return otp
 
+def validate_email(email):
+    if "@" not in email or "." not in email.split('@')[-1]:
+        return False
+    return True
+
 # Initialize session state for login
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
@@ -631,12 +636,13 @@ menu = ["Signup", "Login", "Support", "Win Free Captions"]
 default_index = 1  # Index of "Login" in menu (starts from 0)
 choice = st.sidebar.selectbox("Menu", menu, index=default_index)
 
+
 if not st.session_state.logged_in:
+    st.session_state.new_email = ''
     if choice == "Signup":
         st.subheader("Create a new account")
         st.session_state.new_email = st.text_input("Email Address")
         st.session_state.promo_code = st.text_input("Enter Promo Code (Optional)")
-        st.button("Verify Promo Code")
         promo_code_status = 'unverified'
         if st.session_state.promo_code and st.session_state.new_email:
             if check_promo(st.session_state.promo_code, st.session_state.new_email):
@@ -661,20 +667,34 @@ if not st.session_state.logged_in:
                 # Initialize session state variables if they don't exist
                 if 'otp_generated' not in st.session_state:
                     st.session_state.otp_generated = None
-                if 'signup_stage' not in st.session_state:
-                    st.session_state.signup_stage = None
 
                 if st.button("Signup"):
-                    if signup_user_check(st.session_state.new_email):
-                        st.session_state.otp_generated = generate_otp()
-                        send_email('OTP Verification', f"Please use the following OTP to verify : {st.session_state.otp_generated}", st.session_state.new_email , 'empty', 'empty')
-                        st.success("Please check your email for OTP")
-                        time.sleep(2)
-                        print(st.session_state.otp_generated)
-                        st.session_state.signup_stage = 'otp_sent'
+                    email = st.session_state.new_email
+                    
+                    if not email:
+                        print("No Email")
+                        st.error("Please enter your email address to sign up")
                     else:
-                        st.error("Email address already registered")
-                        st.rerun()
+                        if not validate_email(email):
+                            st.error("Please enter a valid email address")
+                        else:
+                            print("Email present in text: ",st.session_state.new_email)
+                            if signup_user_check(email):
+                                st.session_state.otp_generated = generate_otp()
+                                send_email(
+                                    'OTP Verification',
+                                    f"Please use the following OTP to verify: {st.session_state.otp_generated}",
+                                    email,
+                                    'empty',  # Placeholder for subject, adjust as necessary
+                                    'empty'   # Placeholder for body, adjust as necessary
+                                )
+                                st.success("Please check your email for the OTP")
+                                time.sleep(2)
+                                print(st.session_state.otp_generated)
+                                st.session_state.signup_stage = 'otp_sent'
+                            else:
+                                st.error("Email address already registered")
+                                st.rerun()
 
                 if 'signup_stage' in st.session_state and st.session_state.signup_stage == 'otp_sent':
                     enter_otp = st.text_input("Please enter the OTP received on your Email")
@@ -693,7 +713,9 @@ if not st.session_state.logged_in:
                     sender_email = sender_email_1
 
                     if st.button("Proceed"):
-                        if new_username and new_password:
+                        if not st.session_state.new_email:
+                            st.error("Please enter your email address to sign up")
+                        elif new_username and new_password:
                             if signup_user(new_username, new_password, sender_email, status, st.session_state.new_email, promo_code_status):
                                 st.success('Congratulations! You have signed up for the account.')
                                 recipient_email = 'automatexpos@gmail.com'
@@ -708,8 +730,7 @@ if not st.session_state.logged_in:
                                 st.success('You can log in to continue once your payment is verified.')
                                 time.sleep(5)
                                 st.session_state.signup_stage = None
-                                default_index = 1  # Index of "Login" in menu (starts from 0)
-                                choice = st.sidebar.selectbox("Menu", menu, index=default_index)
+
                                 st.rerun()
                             else:
                                 st.error("Username already exists. Please choose a different username.")
@@ -729,17 +750,32 @@ if not st.session_state.logged_in:
                 st.session_state.signup_stage = None
 
             if st.button("Signup"):
-                if signup_user_check(st.session_state.new_email):
-                    st.session_state.otp_generated = generate_otp()
-                    print(st.session_state.otp_generated)
-                    send_email('OTP Verification', f"Please use the following OTP to verify : {st.session_state.otp_generated}", st.session_state.new_email, 'empty', 'empty')
-                    st.success("Please check your email for OTP")
-                    time.sleep(2)
-                    st.session_state.signup_stage = 'otp_sent'
+                email = st.session_state.new_email
+                
+                if not email:
+                    print("No Email")
+                    st.error("Please enter your email address to sign up")
                 else:
-                    st.error("Email address already registered")
-                    time.sleep(5)
-                    st.rerun()
+                    if not validate_email(email):
+                        st.error("Please enter a valid email address")
+                    else:
+                        print("Email present in text: ",st.session_state.new_email)
+                        if signup_user_check(email):
+                            st.session_state.otp_generated = generate_otp()
+                            send_email(
+                                'OTP Verification',
+                                f"Please use the following OTP to verify: {st.session_state.otp_generated}",
+                                email,
+                                'empty',  # Placeholder for subject, adjust as necessary
+                                'empty'   # Placeholder for body, adjust as necessary
+                            )
+                            st.success("Please check your email for the OTP")
+                            time.sleep(2)
+                            print(st.session_state.otp_generated)
+                            st.session_state.signup_stage = 'otp_sent'
+                        else:
+                            st.error("Email address already registered")
+                            st.rerun()
 
             if 'signup_stage' in st.session_state and st.session_state.signup_stage == 'otp_sent':
                 enter_otp = st.text_input("Please enter the OTP received on your Email")
@@ -755,26 +791,30 @@ if not st.session_state.logged_in:
                 new_username = st.text_input("Enter Username")  # Example input for username
                 new_password = st.text_input("Enter Password", type="password")  # Example input for password
                 sender_email_1 = ''  # Example sender email
-                status = 'trial'
                 sender_email = sender_email_1
 
                 if st.button("Proceed"):
-                    if new_username and new_password:
+                    if not st.session_state.new_email:
+                        st.error("Please enter your email address to sign up")
+                    elif new_username and new_password:
                         if signup_user(new_username, new_password, sender_email, status, st.session_state.new_email, promo_code_status):
-                            with st.spinner('Creating Trial Account...'):
-                                time.sleep(5)
-                            st.success('Congratulations! You have signed up for the Trial account.')
+                            st.success('Congratulations! You have signed up for the account.')
                             recipient_email = 'automatexpos@gmail.com'
                             email_subject = 'New user signup'
                             current_time = datetime.now()
                             print(current_time)
                             email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
                             send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
+
+                            with st.spinner('Please wait while your payment is being processed...'):
+                                time.sleep(5)
+                            st.success('You can log in to continue once your payment is verified.')
                             time.sleep(5)
                             st.session_state.signup_stage = None
+
                             st.rerun()
                         else:
-                            st.error("Username already exists. Please choose a different username")
+                            st.error("Username already exists. Please choose a different username.")
                     else:
                         st.error("Please enter a username and password")
 
