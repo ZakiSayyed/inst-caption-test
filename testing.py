@@ -431,8 +431,30 @@ def call_api(image_data, vibe, prompt):
         """, unsafe_allow_html=True)
         return None
     
+def tries_left(username, password):
+    users = sheet
+    for user in users:
+        if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial':
+            return 1 - user['Count']        
+        if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial' and user['Promo Code Status'] == 'unverified':
+            return 1 - user['Count']
+        if user['Username'] == username and user['Password'] == password and user['Count'] == 3 and user['Status'] == 'trial' and user['Promo Code Status'] == 'verified':
+            return 3 - user['Count']        
+        if user['Username'] == username and user['Password'] == password and user['Count'] <= 1 and user['Status'] == 'trial':
+            return 1 - user['Count']         
+        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
+            return 3 - user['Count'] 
+        elif user['Username'] == username and user['Password'] == password and user['Count'] <= 8 and user['Status'] == 'verified' and user['Promo Code Status'] == 'verified':
+            return 8 - user['Count']
+        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
+            return 0
+    return False
+
 
 def main(username,password):
+
+    remaining_captions = tries_left(username,password)
+    st.markdown(f"Captions Remaining : {remaining_captions}")
 
     image_filename, image_data, base64_image = upload_image()
     
@@ -469,7 +491,9 @@ def check_user(username, password):
     users = sheet
 
     for user in users:
-        if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial' and user['Promo Code Status'] == 'unverified':
+        if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial':
+            return 'limit'        
+        if user['Username'] == username and user['Password'] == password and user['Count'] == 1 and user['Status'] == 'trial' and user['Promo Code Status'] == 'unverified':
             return 'limit'
         if user['Username'] == username and user['Password'] == password and user['Count'] == 3 and user['Status'] == 'trial' and user['Promo Code Status'] == 'verified':
             return 'limit3'        
@@ -477,6 +501,8 @@ def check_user(username, password):
             return True        
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
             return True
+        elif user['Username'] == username and user['Password'] == password and user['Count'] <= 8 and user['Status'] == 'verified' and user['Promo Code Status'] == 'verified':
+            return True        
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
             return 'pending'
     return False
