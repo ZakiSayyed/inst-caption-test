@@ -131,7 +131,7 @@ def croc_game():
     email_address_game = st.text_input("Enter your Email address to play the game", key="email_address_game")
 
     if email_address_game:
-        if validate_email():
+        if validate_email(email_address_game):
             if st.button("Play Game"):
                 status = check_email(email_address_game)
                 if status == 'used':
