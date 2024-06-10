@@ -438,7 +438,7 @@ def tries_left(username, password):
             return 1 - user['Count']        
         if user['Username'] == username and user['Password'] == password and user['Count'] >= 1 and user['Status'] == 'trial' and user['Promo Code Status'] == 'unverified':
             return 1 - user['Count']
-        if user['Username'] == username and user['Password'] == password and user['Count'] == 3 and user['Status'] == 'trial' and user['Promo Code Status'] == 'verified':
+        if user['Username'] == username and user['Password'] == password and user['Count'] <= 3 and user['Status'] == 'trial' and user['Promo Code Status'] == 'verified':
             return 3 - user['Count']        
         if user['Username'] == username and user['Password'] == password and user['Count'] <= 1 and user['Status'] == 'trial':
             return 1 - user['Count']         
