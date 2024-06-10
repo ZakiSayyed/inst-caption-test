@@ -131,15 +131,17 @@ def croc_game():
     email_address_game = st.text_input("Enter your Email address to play the game", key="email_address_game")
 
     if email_address_game:
-        if st.button("Play Game"):
-            status = check_email(email_address_game)
-            if status == 'used':
-                st.error("Email address already used")
-                time.sleep(5)
-                st.rerun()
-            else:
-                st.session_state.game_state['game_started'] = True
-
+        if validate_email():
+            if st.button("Play Game"):
+                status = check_email(email_address_game)
+                if status == 'used':
+                    st.error("Email address already used")
+                    time.sleep(5)
+                    st.rerun()
+                else:
+                    st.session_state.game_state['game_started'] = True
+        else:
+            st.error("Please enter a valid Email address")
         if st.session_state.game_state['game_started']:
             # Display remaining tries
             if st.session_state.game_state['tries_left'] > 0:
