@@ -242,12 +242,26 @@ def send_email(subject, message, to_email, image_filename, image_data):
 def is_file_size_acceptable(file, max_size):
     return file.size <= max_size  
 
-def upload_image(type):
+def upload_image_screenshot():
 
-    if type == 'upload':          
-        uploaded_file = st.file_uploader('UPLOAD AN IMAGE OR PHOTO (MAX 4MB)', type=["jpg", "jpeg", "png"], accept_multiple_files=False)
-    else:
-        uploaded_file = st.file_uploader('UPLOAD SCREENSHOT OF THE PAYMENT', type=["jpg", "jpeg", "png"], accept_multiple_files=False)
+    uploaded_file = st.file_uploader('UPLOAD SCREENSHOT OF THE PAYMENT', type=["jpg", "jpeg", "png"], accept_multiple_files=False)
+
+    if uploaded_file is not None:
+        if is_file_size_acceptable(uploaded_file, 4*1024*1024):
+            st.image(uploaded_file, width=300)
+            st.success("Image uploaded successfully")
+            filename = os.path.basename(uploaded_file.name)
+            image_data = uploaded_file.getvalue()  # Already bytes
+            base64_image = encode_image(image_data)
+            
+            return filename, image_data, base64_image
+        else:
+            st.error("File size exceeds the maximum limit of 4 MB")
+    return None, None, None  # Indicate no image uploaded
+
+def upload_image():
+
+    uploaded_file = st.file_uploader('UPLOAD AN IMAGE OR PHOTO (MAX 4MB)', type=["jpg", "jpeg", "png"], accept_multiple_files=False)
 
     if uploaded_file is not None:
         if is_file_size_acceptable(uploaded_file, 4*1024*1024):
@@ -472,7 +486,7 @@ def main(username,password):
     elif account_state == 'verified':
         st.markdown("Account : Paid")
 
-    image_filename, image_data, base64_image = upload_image('upload')
+    image_filename, image_data, base64_image = upload_image()
     
     selected_vibe = select_vibe()
 
@@ -925,7 +939,7 @@ if not st.session_state.logged_in:
         elif ticket_type == "Subscription Request":
             support_email_sender = st.text_input("Please enter your email address")
             support_username_sender = st.text_input("Please enter your Username")
-            image_filename, image_data, base64_image = upload_image()
+            image_filename, image_data, base64_image = upload_image_screenshot()
 
             if st.session_state.button_pressed:
                 st.warning("You have already submitted your request.")
