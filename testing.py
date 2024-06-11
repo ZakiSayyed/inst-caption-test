@@ -242,9 +242,13 @@ def send_email(subject, message, to_email, image_filename, image_data):
 def is_file_size_acceptable(file, max_size):
     return file.size <= max_size  
 
-def upload_image():
-    uploaded_file = st.file_uploader('1.UPLOAD AN IMAGE OR PHOTO (MAX 4MB)', type=["jpg", "jpeg", "png"], accept_multiple_files=False)
-    
+def upload_image(type):
+
+    if type == 'upload':          
+        uploaded_file = st.file_uploader('UPLOAD AN IMAGE OR PHOTO (MAX 4MB)', type=["jpg", "jpeg", "png"], accept_multiple_files=False)
+    else:
+        uploaded_file = st.file_uploader('UPLOAD SCREENSHOT OF THE PAYMENT', type=["jpg", "jpeg", "png"], accept_multiple_files=False)
+
     if uploaded_file is not None:
         if is_file_size_acceptable(uploaded_file, 4*1024*1024):
             st.image(uploaded_file, width=300)
@@ -468,7 +472,7 @@ def main(username,password):
     elif account_state == 'verified':
         st.markdown("Account : Paid")
 
-    image_filename, image_data, base64_image = upload_image()
+    image_filename, image_data, base64_image = upload_image('upload')
     
     selected_vibe = select_vibe()
 
