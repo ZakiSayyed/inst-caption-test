@@ -852,6 +852,7 @@ if not st.session_state.logged_in:
                 sender_email = sender_email_1
 
                 if st.button("Proceed"):
+                    status = 'trial'
                     if not st.session_state.new_email:
                         st.error("Please enter your email address to sign up")
                     elif new_username and new_password:
