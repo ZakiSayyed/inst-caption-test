@@ -694,16 +694,6 @@ menu = ["Signup", "Login", "Support", "Win Free Captions"]
 default_index = 1  # Index of "Login" in menu (starts from 0)
 choice = st.sidebar.selectbox("Menu", menu, index=default_index)
 
-def select_country():
-    # Define the options for the dropdown
-    options = ["Pakistan", "United States", "Other"]
-
-    # Create a selectbox (dropdown) with a search option
-    selected_option = st.selectbox("Choose a country", options)
-
-    # Display the selected option
-    st.write("You selected:", selected_option)
-
 
 if not st.session_state.logged_in:
     st.session_state.new_email = ''
@@ -719,7 +709,6 @@ if not st.session_state.logged_in:
             else:
                 st.error("Promo code does not match")
 
-        select_country()
         subscription_type = st.radio("Select Subscription Type", ["Free Trial (1 Caption only)", "Paid Subscription"])
 
         sender_email_1 = None  # Define sender_email_1 here
@@ -863,7 +852,6 @@ if not st.session_state.logged_in:
                 sender_email = sender_email_1
 
                 if st.button("Proceed"):
-                    status = 'trial'
                     if not st.session_state.new_email:
                         st.error("Please enter your email address to sign up")
                     elif new_username and new_password:
