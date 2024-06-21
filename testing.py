@@ -709,7 +709,7 @@ if 'username' not in st.session_state:
 if 'password' not in st.session_state:
     st.session_state.password = None
 
-menu = ["Signup", "Login", "Support", "Feedback", "Win Free Captions"]
+menu = ["Signup", "Login", "Win Free Captions", "Feedback", "Support"]
 
 # Use the index of the default choice in the options list
 default_index = 1  # Index of "Login" in menu (starts from 0)
@@ -983,7 +983,7 @@ if not st.session_state.logged_in:
         user_exp = st.slider('USER EXPERIENCE:', min_value=0, max_value=5, step=1)
         caption_quality = st.slider('CAPTION QUALITY:', min_value=0, max_value=5, step=1)
         feedback_email = st.text_input("Please enter your email")
-        feedback_text = st.text_input("Please enter your feedback here")
+        feedback_text = st.text_input("Additional Feedback")
         if st.button("Submit Feedback"):
             feedback(feedback_email, feedback_text, user_exp, caption_quality)
             st.balloons()
