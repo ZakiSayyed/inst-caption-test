@@ -537,6 +537,27 @@ def check_user(username, password):
             return 'pending'
     return False
 
+
+def feedback(email, text_feedback, ux, caption_quality):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict({
+        "type": "service_account",
+        "project_id": st.secrets["google_sheets"]["project_id"],
+        "private_key_id": st.secrets["google_sheets"]["private_key_id"],
+        "private_key": st.secrets["google_sheets"]["private_key"],
+        "client_email": st.secrets["google_sheets"]["client_email"],
+        "client_id": st.secrets["google_sheets"]["client_id"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": st.secrets["google_sheets"]["client_x509_cert_url"]
+    }, scope)
+    client = gspread.authorize(creds)
+    sheet_id = '1Bsv2n_12_wmWhNI5I5HgCmBWsVyAHFw3rfTGoIrT5ho'
+    sheet = client.open_by_key(sheet_id).get_worksheet(3)
+    sheet.append_row([email,text_feedback,ux,caption_quality])
+    return True
+
 def signup_add_user(username, password, sender_email, status, email, promo_code_status):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict({
@@ -688,7 +709,7 @@ if 'username' not in st.session_state:
 if 'password' not in st.session_state:
     st.session_state.password = None
 
-menu = ["Signup", "Login", "Support", "Win Free Captions"]
+menu = ["Signup", "Login", "Support", "Feedback", "Win Free Captions"]
 
 # Use the index of the default choice in the options list
 default_index = 1  # Index of "Login" in menu (starts from 0)
@@ -957,8 +978,17 @@ if not st.session_state.logged_in:
                 elif st.session_state.button_pressed:
                     st.warning("You have already submitted your request.")
 
-
-
+    elif choice == "Feedback":
+        st.subheader("Welcome to Feedback")
+        user_exp = st.slider('USER EXPERIENCE:', min_value=0, max_value=5, step=1)
+        caption_quality = st.slider('CAPTION QUALITY:', min_value=0, max_value=5, step=1)
+        feedback_email = st.text_input("Please enter your email")
+        feedback_text = st.text_input("Please enter your feedback here")
+        if st.button("Submit Feedback"):
+            feedback(feedback_email, feedback_text, user_exp, caption_quality)
+            st.balloons()
+            st.success("Thank you for submitting your feedback, we will get back to you soon.")
+            st.rerun()
 else:
     main(st.session_state.username, st.session_state.password)
 
