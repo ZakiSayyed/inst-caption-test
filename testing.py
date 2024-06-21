@@ -988,6 +988,7 @@ if not st.session_state.logged_in:
             feedback(feedback_email, feedback_text, user_exp, caption_quality)
             st.balloons()
             st.success("Thank you for submitting your feedback, we will get back to you soon.")
+            time.sleep(5)
             st.rerun()
 else:
     main(st.session_state.username, st.session_state.password)
