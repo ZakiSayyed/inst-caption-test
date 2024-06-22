@@ -11,6 +11,7 @@ from email.mime.text import MIMEText
 from datetime import datetime
 from email.mime.image import MIMEImage
 import random
+import streamlit.components.v1 as components
 
 
 smtp_server = 'smtp.mail.yahoo.com'
@@ -460,10 +461,10 @@ def tries_left(username, password):
             return 3 - user['Count']        
         if user['Username'] == username and user['Password'] == password and user['Count'] <= 1 and user['Status'] == 'trial':
             return 1 - user['Count']         
-        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
-            return 3 - user['Count'] 
-        elif user['Username'] == username and user['Password'] == password and user['Count'] <= 8 and user['Status'] == 'verified' and user['Promo Code Status'] == 'verified':
-            return 8 - user['Count']
+        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified' and user['Promo Code Status'] == 'unverified' :
+            return 10 - user['Count'] 
+        elif user['Username'] == username and user['Password'] == password and user['Count'] <= 12 and user['Status'] == 'verified' and user['Promo Code Status'] == 'verified':
+            return 12 - user['Count']
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
             return 0
     return False
@@ -529,9 +530,9 @@ def check_user(username, password):
             return 'limit3'        
         if user['Username'] == username and user['Password'] == password and user['Count'] <= 2 and user['Status'] == 'trial':
             return True        
-        elif user['Username'] == username and user['Password'] == password and user['Status'] == 'verified':
+        elif user['Username'] == username and user['Password'] == password and user['Count'] <= 10 and user['Status'] == 'verified':
             return True
-        elif user['Username'] == username and user['Password'] == password and user['Count'] <= 8 and user['Status'] == 'verified' and user['Promo Code Status'] == 'verified':
+        elif user['Username'] == username and user['Password'] == password and user['Count'] <= 12 and user['Status'] == 'verified' and user['Promo Code Status'] == 'verified':
             return True        
         elif user['Username'] == username and user['Password'] == password and user['Status'] == 'pending':
             return 'pending'
@@ -735,13 +736,12 @@ if not st.session_state.logged_in:
         sender_email_1 = None  # Define sender_email_1 here
         status = 'pending'
         if subscription_type == "Paid Subscription":
-            # payment_type = st.radio("Select Payment Type", ["Crypto - USDT", "Paypal"])
-            payment_type = st.radio("Select Payment Type", ["Crypto - USDT"])
-            if payment_type == "Crypto - USDT":
-                st.subheader("Crypto - USDT (5$ for 10 Captions)")
-                st.markdown("<h1 style='text-align: left; font-size: 20px;'>Make sure to use only -BNB Smart Chain- Network.</h1>", unsafe_allow_html=True)
-                st.markdown("<h1 style='text-align: left; font-size: 25px;'>Wallet Address</h1>", unsafe_allow_html=True)
-                st.markdown("<h1 style='text-align: left; font-size: 20px;'>0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1</h1>", unsafe_allow_html=True)
+            country = st.selectbox("Select your country", ["Pakistan", "Other"])
+            if country == 'Pakistan':
+                st.subheader("Pkr 1K for 10 Captions")
+                # st.markdown("<h1 style='text-align: left; font-size: 20px;'>Make sure to use only -BNB Smart Chain- Network.</h1>", unsafe_allow_html=True)
+                st.markdown("<h1 style='text-align: left; font-size: 25px;'>Easypaisa Account : 03339269981</h1>", unsafe_allow_html=True)
+                # st.markdown("<h1 style='text-align: left; font-size: 20px;'>03339269981</h1>", unsafe_allow_html=True)
 
                 # Initialize session state variables if they don't exist
                 if 'otp_generated' not in st.session_state:
@@ -815,12 +815,95 @@ if not st.session_state.logged_in:
                                 st.error("Username already exists. Please choose a different username.")
                         else:
                             st.error("Please enter a username and password")
-
-                # st.im("",caption="0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1")
+                                
             else:
-                st.subheader("Pay to : xyz@gmail.com")
-                # st.markdown("<h1 style='text-align: left; font-size: 20px;'>Email : xyz@gmail.com.</h1>", unsafe_allow_html=True)
-                sender_email_1 = st.text_input("Sender Email (For confirmation)")
+                    
+                # # payment_type = st.radio("Select Payment Type", ["Crypto - USDT", "Paypal"])
+                # payment_type = st.radio("Select Payment Type", ["Crypto - USDT"])
+                # if payment_type == "Crypto - USDT":
+                    st.subheader("Crypto - USDT (5$ for 10 Captions)")
+                    st.markdown("<h1 style='text-align: left; font-size: 20px;'>Make sure to use only -BNB Smart Chain- Network.</h1>", unsafe_allow_html=True)
+                    st.markdown("<h1 style='text-align: left; font-size: 25px;'>Wallet Address : 0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1</h1>", unsafe_allow_html=True)
+                    # st.markdown("<h1 style='text-align: left; font-size: 20px;'>0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1</h1>", unsafe_allow_html=True)
+
+                    # Initialize session state variables if they don't exist
+                    if 'otp_generated' not in st.session_state:
+                        st.session_state.otp_generated = None
+
+                    if st.button("Signup"):
+                        email = st.session_state.new_email
+                        
+                        if not email:
+                            print("No Email")
+                            st.error("Please enter your email address to sign up")
+                        else:
+                            if not validate_email(email):
+                                st.error("Please enter a valid email address")
+                            else:
+                                print("Email present in text: ",st.session_state.new_email)
+                                if signup_user_check(email):
+                                    st.session_state.otp_generated = generate_otp()
+                                    send_email(
+                                        'OTP Verification',
+                                        f"Please use the following OTP to verify: {st.session_state.otp_generated}",
+                                        email,
+                                        'empty',  # Placeholder for subject, adjust as necessary
+                                        'empty'   # Placeholder for body, adjust as necessary
+                                    )
+                                    st.success("Please check your email for the OTP")
+                                    time.sleep(2)
+                                    print(st.session_state.otp_generated)
+                                    st.session_state.signup_stage = 'otp_sent'
+                                else:
+                                    st.error("Email address already registered")
+                                    st.rerun()
+
+                    if 'signup_stage' in st.session_state and st.session_state.signup_stage == 'otp_sent':
+                        enter_otp = st.text_input("Please enter the OTP received on your Email")
+                        print(enter_otp)
+                        if st.button("Verify OTP"):
+                            if enter_otp == st.session_state.otp_generated:
+                                print("OTP Entered matched")
+                                st.session_state.signup_stage = 'user_details'  # Move to the next stage
+                            else:
+                                st.error("OTP entered is incorrect")
+
+                    if 'signup_stage' in st.session_state and st.session_state.signup_stage == 'user_details':
+                        new_username = st.text_input("Enter Username")  # Example input for username
+                        new_password = st.text_input("Enter Password", type="password")  # Example input for password
+                        sender_email_1 = ''  # Example sender email
+                        sender_email = sender_email_1
+
+                        if st.button("Proceed"):
+                            if not st.session_state.new_email:
+                                st.error("Please enter your email address to sign up")
+                            elif new_username and new_password:
+                                if signup_user(new_username, new_password, sender_email, status, st.session_state.new_email, promo_code_status):
+                                    st.success('Congratulations! You have signed up for the account.')
+                                    recipient_email = 'automatexpos@gmail.com'
+                                    email_subject = 'New user signup'
+                                    current_time = datetime.now()
+                                    print(current_time)
+                                    email_message = f'A new user has signed up\nUsername : {new_username}\nSubscription : {status}\nTime : {current_time}'
+                                    send_email(email_subject, email_message, recipient_email, 'empty', 'empty')
+
+                                    with st.spinner('Please wait while your payment is being processed...'):
+                                        time.sleep(5)
+                                    st.success('You can log in to continue once your payment is verified.')
+                                    time.sleep(5)
+                                    st.session_state.signup_stage = None
+
+                                    st.rerun()
+                                else:
+                                    st.error("Username already exists. Please choose a different username.")
+                            else:
+                                st.error("Please enter a username and password")
+
+                #     # st.im("",caption="0x12c9A85Ae794A84aCdD0B781DD7F6A3a2C96eBf1")
+                # else:
+                #     st.subheader("Pay to : xyz@gmail.com")
+                #     # st.markdown("<h1 style='text-align: left; font-size: 20px;'>Email : xyz@gmail.com.</h1>", unsafe_allow_html=True)
+                #     sender_email_1 = st.text_input("Sender Email (For confirmation)")
         else:
             # Initialize session state variables if they don't exist
             if 'otp_generated' not in st.session_state:
@@ -993,14 +1076,9 @@ if not st.session_state.logged_in:
 else:
     main(st.session_state.username, st.session_state.password)
 
-st.write("<br>", unsafe_allow_html=True)
-st.write("<br>", unsafe_allow_html=True)
-st.write("<br>", unsafe_allow_html=True)
-st.write("<br>", unsafe_allow_html=True)
-st.write("<br>", unsafe_allow_html=True)
-st.write("<br>", unsafe_allow_html=True)
-st.write("<br>", unsafe_allow_html=True)
-st.write("<br>", unsafe_allow_html=True)
-st.write("<br>", unsafe_allow_html=True)
+# st.write("<br>", unsafe_allow_html=True)
+# st.write("<br>", unsafe_allow_html=True)
+
+
 
 st.markdown("<h1 style='text-align: center; font-size: 15px;'>Support Email: automatexpos@gmail.com</h1>", unsafe_allow_html=True)
